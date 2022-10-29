@@ -1,4 +1,4 @@
-import React, { memo, Profiler, ProfilerOnRenderCallback, PropsWithChildren } from "react";
+import { memo, Profiler, ProfilerOnRenderCallback, PropsWithChildren } from "react";
 import { cols, rows } from "./data";
 
 export const ProfiledGrid = memo(function ProfiledGrid({ name, getRow: Row, getCol: Col, handleRender }: { name: string; getRow: (props: PropsWithChildren) => JSX.Element, getCol: (props: PropsWithChildren) => JSX.Element, handleRender: ProfilerOnRenderCallback }) {
