@@ -1,0 +1,10 @@
+.rowStyleModule {
+    display: flex;
+}
+
+.colStyleModule {
+    height: 4px;
+    width: 4px;
+    border: 1px solid white;
+    background-color: red
+}
