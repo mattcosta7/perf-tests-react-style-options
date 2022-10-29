@@ -6,6 +6,7 @@ import { colStyle, rowStyle } from './styles';
 import { columnStyledVanilla, rowStyleVanilla } from './styles.css';
 import styles from './style.module.css'
 import { ThemeProvider } from 'styled-components';
+import { createRoot } from 'react-dom/client';
 
 const InlineStyleDivRow = ({ children }: PropsWithChildren) => <div style={{ ...rowStyle }}>{children}</div>
 const InlineStyleDivColumn = () => <div style={{ ...colStyle }} />
@@ -20,8 +21,11 @@ const InlineStyleBoxColumn = () => <Box style={{ ...colStyle }} />
 const InlineSXBoxRow = ({ children }: PropsWithChildren) => <Box sx={{ ...rowStyle }}>{children}</Box>
 const InlineSXBoxColumn = () => <Box sx={{ ...colStyle }} />
 
+function reducer(s: number) {
+  return s + 1;
+}
 function App() {
-  const [renders, forceRender] = useReducer((state => state + 1), 0)
+  const [renders, forceRender] = useReducer(reducer, 1)
   const renderHistory = useRef<Record<string, Array<{ id: string; phase: string; duration: number }>>>({});
 
   const handleRender: ProfilerOnRenderCallback = (
@@ -50,23 +54,44 @@ function App() {
         count: hist.length,
         durationAverage: hist.reduce((acc, curr) => acc + curr.duration, 0) / hist.length
       }
-    })
-    console.table(eachType.sort((a, b) => b.durationAverage - a.durationAverage));
+    }).sort((a, b) => b.durationAverage - a.durationAverage)
+
+    const el = document.getElementById('output')
+    if (!el) return
+
+    const root = createRoot(el)
+    root.render(<table>
+      <thead>
+        <tr>
+          <th>id</th>
+          <th>phase</th>
+          <th>duration</th>
+          <th>count</th>
+          <th>durationAverage</th>
+        </tr>
+      </thead>
+      <tbody>
+        {eachType.map((row) => {
+          return <tr key={row.id}>
+            <td>{row.id}</td>
+            <td>{row.phase}</td>
+            <td>{row.duration}</td>
+            <td>{row.count}</td>
+            <td>{row.durationAverage}</td>
+          </tr>
+        })}
+      </tbody>
+    </table>)
+
+
   });
 
   return (
     <div>
-
-      <dl>
-        <dt>
-          Renders:
-        </dt>
-        <dd>
-          {renders}
-        </dd>
-      </dl>
+      <div id="output"></div>
 
       <button onClick={() => forceRender()}>force render</button>
+      <button onClick={() => window.location.reload()}>reset</button>
       <ul>
         <ProfiledGrid name="inline" handleRender={handleRender}
           getRow={InlineStyleDivRow}
