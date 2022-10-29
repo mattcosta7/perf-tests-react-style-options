@@ -1,5 +1,5 @@
 import { Box, theme } from '@primer/react';
-import { ProfilerOnRenderCallback, useEffect, useReducer, useRef, PropsWithChildren } from 'react'
+import { ProfilerOnRenderCallback, useEffect, useReducer, useRef, PropsWithChildren, useCallback } from 'react'
 import { ProfiledGrid } from './grid';
 import { StyledCol, StyledRowWithPropsGetter, StyledColumnWithPropsGetter, StyledColWithSx, StyledRow, StyledRowWithSx } from './styled';
 import { colStyle, rowStyle } from './styles';
@@ -7,6 +7,7 @@ import { columnStyledVanilla, rowStyleVanilla } from './styles.css';
 import styles from './style.module.css'
 import { ThemeProvider } from 'styled-components';
 import { createRoot, Root } from 'react-dom/client';
+import { columnsCount, rowsCount } from './params';
 
 const InlineStyleDivRow = ({ children }: PropsWithChildren) => <div style={{ ...rowStyle }}>{children}</div>
 const InlineStyleDivColumn = () => <div style={{ ...colStyle }} />
@@ -57,7 +58,7 @@ function App() {
     dispatch('switch-mode');
   }
 
-  const handleRender: ProfilerOnRenderCallback = (
+  const handleRender: ProfilerOnRenderCallback = useCallback((
     id,
     phase,
     duration,
@@ -71,7 +72,7 @@ function App() {
       phase,
       duration
     })
-  };
+  }, [])
 
   const outputRoot = useRef<Root | null>(null);
   useEffect(() => {
@@ -149,54 +150,88 @@ function App() {
         Two modes:
         <ul>
           <li>Update mode (default): mounts once, then re-renders update the react tree. This most closely mirrors production behavior</li>
-
           <li>Mount mode: forces the react tree to unmount/remount by changing a top level key prop</li>
         </ul>
       </p>
+      <div>
+
+
+        <form>
+          <fieldset>
+            <legend>Grid size (submitting forces a refresh)</legend>
+            <div>
+              <label>
+                rows:
+                <input type="number" name="rows" defaultValue={rowsCount} />
+              </label>
+            </div>
+            <div>
+              <label>
+                columns:
+                <input type="number" name="cols" defaultValue={columnsCount} />
+              </label>
+            </div>
+            <button type="submit">
+              Change size
+            </button>
+          </fieldset>
+        </form>
+      </div>
+
       <button onClick={() => dispatch('increment')}>force render</button>
       <button onClick={() => switchMode()}>Switch to {state.mode === 'mount' ? 'update' : 'mount'} mode</button>
-      <button onClick={() => window.location.reload()}>reset</button>
+      <button onClick={() => window.location.reload()}>reset history</button>
 
       <div ref={outputRef} />
       <ul key={state.mode === 'mount' ? state.renderCount : undefined}>
-        <ProfiledGrid name="Inline styles" handleRender={handleRender}
+        <ProfiledGrid name="Inline styles"
+          handleRender={handleRender}
           getRow={InlineStyleDivRow}
           getCol={InlineStyleDivColumn}
         />
-        <ProfiledGrid name="CSS Modules" handleRender={handleRender}
+        <ProfiledGrid name="CSS Modules"
+          handleRender={handleRender}
           getRow={ModStyleDivRow}
           getCol={ModStyleDivColumn}
         />
-        <ProfiledGrid name="Vanilla extract" handleRender={handleRender}
+        <ProfiledGrid name="Vanilla extract"
+          handleRender={handleRender}
           getRow={VanillaStyleDivRow}
           getCol={VanillaStyleDivColumn}
         />
-        <ProfiledGrid name="Styled components without dynamic styles" handleRender={handleRender}
+        <ProfiledGrid name="Styled components without dynamic styles"
+          handleRender={handleRender}
           getRow={StyledRow}
           getCol={StyledCol}
         />
-        <ProfiledGrid name="Styled components with a dynamic style, but consistent" handleRender={handleRender}
+        <ProfiledGrid name="Styled components with a dynamic style, but consistent"
+          handleRender={handleRender}
           getRow={StyledRowWithPropsGetter}
           getCol={StyledColumnWithPropsGetter}
         />
-        <ProfiledGrid name="Styled components, using SX prop (like primer)" handleRender={handleRender}
+        <ProfiledGrid name="Styled components, using SX prop (like primer)"
+          handleRender={handleRender}
           getRow={InlineSXStyledRow}
           getCol={InlineSXStyledColumn}
         />
-        <ProfiledGrid name="Box component, using SX Prop" handleRender={handleRender}
+        <ProfiledGrid name="Box component, using SX Prop"
+          handleRender={handleRender}
           getRow={InlineSXBoxRow}
           getCol={InlineSXBoxColumn}
         />
-        <ProfiledGrid name="Box component, with inline style (no sx prop)" handleRender={handleRender}
+        <ProfiledGrid name="Box component, with inline style (no sx prop)"
+          handleRender={handleRender}
           getRow={InlineStyleBoxRow}
           getCol={InlineStyleBoxColumn}
         />
         <ThemeProvider theme={theme}>
-          <ProfiledGrid name="Box component, using SX Prop, wrapped in a theme" handleRender={handleRender}
+          <ProfiledGrid name="Box component, using SX Prop, wrapped in a theme"
+            handleRender={handleRender}
             getRow={InlineSXBoxRow}
             getCol={InlineSXBoxColumn}
           />
-          <ProfiledGrid name="Box component, using inline styles, wrapped in a theme" handleRender={handleRender}
+          <ProfiledGrid name="Box component, using inline styles, wrapped in a theme"
+            handleRender={handleRender}
             getRow={InlineStyleBoxRow}
             getCol={InlineStyleBoxColumn}
           />
