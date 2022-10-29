@@ -1,12 +1,12 @@
 import { Box, theme } from '@primer/react';
-import { ProfilerOnRenderCallback, Profiler, useEffect, useReducer, useRef, PropsWithChildren } from 'react'
+import { ProfilerOnRenderCallback, useEffect, useReducer, useRef, PropsWithChildren } from 'react'
 import { ProfiledGrid } from './grid';
-import { StyledCol, StyledColWithSx, StyledRow, StyledRowWithSx } from './styled';
+import { StyledCol, StyledRowWithPropsGetter, StyledColumnWithPropsGetter, StyledColWithSx, StyledRow, StyledRowWithSx } from './styled';
 import { colStyle, rowStyle } from './styles';
 import { columnStyledVanilla, rowStyleVanilla } from './styles.css';
 import styles from './style.module.css'
 import { ThemeProvider } from 'styled-components';
-import { createRoot } from 'react-dom/client';
+import { createRoot, Root } from 'react-dom/client';
 
 const InlineStyleDivRow = ({ children }: PropsWithChildren) => <div style={{ ...rowStyle }}>{children}</div>
 const InlineStyleDivColumn = () => <div style={{ ...colStyle }} />
@@ -21,12 +21,41 @@ const InlineStyleBoxColumn = () => <Box style={{ ...colStyle }} />
 const InlineSXBoxRow = ({ children }: PropsWithChildren) => <Box sx={{ ...rowStyle }}>{children}</Box>
 const InlineSXBoxColumn = () => <Box sx={{ ...colStyle }} />
 
-function reducer(s: number) {
-  return s + 1;
+function reducer(state: {
+  renderCount: number
+  mode: 'mount' | 'update'
+}, action: 'increment' | 'switch-mode'): {
+  renderCount: number
+  mode: 'mount' | 'update'
+} {
+  switch (action) {
+    case 'increment': {
+      return {
+        ...state,
+        renderCount: state.renderCount + 1
+      }
+    }
+    case 'switch-mode': {
+      return {
+        renderCount: 0,
+        mode: state.mode === 'mount' ? 'update' : 'mount',
+      }
+    }
+  }
 }
 function App() {
-  const [renders, forceRender] = useReducer(reducer, 1)
+  const outputRef = useRef<HTMLDivElement>(null)
+  const [state, dispatch] = useReducer(reducer, { renderCount: 1, mode: 'update' as const });
+
   const renderHistory = useRef<Record<string, Array<{ id: string; phase: string; duration: number }>>>({});
+
+  /**
+   * When we switch mode, clear the history first to avoid confusion
+   */
+  const switchMode = () => {
+    renderHistory.current = {};
+    dispatch('switch-mode');
+  }
 
   const handleRender: ProfilerOnRenderCallback = (
     id,
@@ -44,94 +73,134 @@ function App() {
     })
   };
 
+  const outputRoot = useRef<Root | null>(null);
   useEffect(() => {
+    if (!outputRef.current) return
+    outputRoot.current = createRoot(outputRef.current)
+  }, [])
+
+  useEffect(() => {
+    if (!outputRoot.current) return
     const eachType = Object.values(renderHistory.current).map((hist) => {
-      const last = hist.at(-1)
+      const last = hist.at(-1)!
       return {
-        id: last?.id,
-        phase: last?.phase,
-        duration: last?.duration,
+        id: last.id,
+        phase: last.phase,
+        duration: last.duration,
         count: hist.length,
         durationAverage: hist.reduce((acc, curr) => acc + curr.duration, 0) / hist.length
       }
-    }).sort((a, b) => b.durationAverage - a.durationAverage)
+    })
 
-    const el = document.getElementById('output')
-    if (!el) return
+    let fastestRender = eachType[0]
+    for (const render of eachType) {
+      if (render.durationAverage < fastestRender.durationAverage) {
+        fastestRender = render
+      }
+    }
 
-    const root = createRoot(el)
-    root.render(<table>
-      <thead>
-        <tr>
-          <th>id</th>
-          <th>phase</th>
-          <th>duration</th>
-          <th>count</th>
-          <th>durationAverage</th>
-        </tr>
-      </thead>
-      <tbody>
-        {eachType.map((row) => {
-          return <tr key={row.id}>
-            <td>{row.id}</td>
-            <td>{row.phase}</td>
-            <td>{row.duration}</td>
-            <td>{row.count}</td>
-            <td>{row.durationAverage}</td>
+    const output = eachType.map((hist) => {
+      return {
+        ...hist,
+        difference: (((hist.durationAverage - fastestRender.durationAverage) / fastestRender.durationAverage) * 100)
+      }
+    })
+
+
+    outputRoot.current.render(
+      <table>
+        <thead>
+          <tr>
+            <th colSpan={6} style={{ textAlign: 'center' }}>
+              Mode: {state.mode}
+            </th>
           </tr>
-        })}
-      </tbody>
-    </table>)
-
-
+          <tr>
+            <th>id</th>
+            <th>phase</th>
+            <th>duration</th>
+            <th>count</th>
+            <th>durationAverage</th>
+            <th>% difference from fastest (avg)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {output.sort((a, b) => b.durationAverage - a.durationAverage).map((row) => {
+            return (
+              <tr key={row.id}>
+                <td>{row.id}</td>
+                <td>{row.phase}</td>
+                <td>{row.duration.toFixed(3)}</td>
+                <td>{row.count}</td>
+                <td>{row.durationAverage.toFixed(3)}</td>
+                <td>{row.difference.toFixed(3)}</td>
+              </tr>
+            )
+          })}
+        </tbody>
+      </table>
+    )
   });
 
   return (
     <div>
-      <div id="output"></div>
+      <p>
+        A small app to measure render performance of various style combinations.
+        Two modes:
+        <ul>
+          <li>Update mode (default): mounts once, then re-renders update the react tree. This most closely mirrors production behavior</li>
 
-      <button onClick={() => forceRender()}>force render</button>
+          <li>Mount mode: forces the react tree to unmount/remount by changing a top level key prop</li>
+        </ul>
+      </p>
+      <button onClick={() => dispatch('increment')}>force render</button>
+      <button onClick={() => switchMode()}>Switch to {state.mode === 'mount' ? 'update' : 'mount'} mode</button>
       <button onClick={() => window.location.reload()}>reset</button>
-      <ul>
-        <ProfiledGrid name="inline" handleRender={handleRender}
+
+      <div ref={outputRef} />
+      <ul key={state.mode === 'mount' ? state.renderCount : undefined}>
+        <ProfiledGrid name="Inline styles" handleRender={handleRender}
           getRow={InlineStyleDivRow}
           getCol={InlineStyleDivColumn}
         />
-        <ProfiledGrid name="css-module" handleRender={handleRender}
+        <ProfiledGrid name="CSS Modules" handleRender={handleRender}
           getRow={ModStyleDivRow}
           getCol={ModStyleDivColumn}
         />
-        <ProfiledGrid name="vanilla-extract" handleRender={handleRender}
+        <ProfiledGrid name="Vanilla extract" handleRender={handleRender}
           getRow={VanillaStyleDivRow}
           getCol={VanillaStyleDivColumn}
         />
-        <ProfiledGrid name="styled-component-with-static-style" handleRender={handleRender}
+        <ProfiledGrid name="Styled components without dynamic styles" handleRender={handleRender}
           getRow={StyledRow}
           getCol={StyledCol}
         />
-        <ProfiledGrid name="styled-component-with-sx-style" handleRender={handleRender}
+        <ProfiledGrid name="Styled components with a dynamic style, but consistent" handleRender={handleRender}
+          getRow={StyledRowWithPropsGetter}
+          getCol={StyledColumnWithPropsGetter}
+        />
+        <ProfiledGrid name="Styled components, using SX prop (like primer)" handleRender={handleRender}
           getRow={InlineSXStyledRow}
           getCol={InlineSXStyledColumn}
         />
-        <ProfiledGrid name="box-with-sx-style" handleRender={handleRender}
+        <ProfiledGrid name="Box component, using SX Prop" handleRender={handleRender}
           getRow={InlineSXBoxRow}
           getCol={InlineSXBoxColumn}
         />
-        <ProfiledGrid name="box-with-inline-style" handleRender={handleRender}
+        <ProfiledGrid name="Box component, with inline style (no sx prop)" handleRender={handleRender}
           getRow={InlineStyleBoxRow}
           getCol={InlineStyleBoxColumn}
         />
         <ThemeProvider theme={theme}>
-          <ProfiledGrid name="theme-dbox-with-sx-style" handleRender={handleRender}
+          <ProfiledGrid name="Box component, using SX Prop, wrapped in a theme" handleRender={handleRender}
             getRow={InlineSXBoxRow}
             getCol={InlineSXBoxColumn}
           />
-          <ProfiledGrid name="theme-dbox-with-inline-style" handleRender={handleRender}
+          <ProfiledGrid name="Box component, using inline styles, wrapped in a theme" handleRender={handleRender}
             getRow={InlineStyleBoxRow}
             getCol={InlineStyleBoxColumn}
           />
         </ThemeProvider>
-
       </ul>
     </div>
   )
