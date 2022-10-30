@@ -72,11 +72,13 @@ function App() {
     if (!outputRoot.current) return
     const eachType = Object.values(renderHistory.current).map((hist) => {
       const last = hist.at(-1)!
+      const durationTotal = hist.reduce((acc, { duration }) => acc + duration, 0)
       return {
         id: last.id,
         phase: last.phase,
         duration: last.duration,
         count: hist.length,
+        durationTotal,
         durationAverage: hist.reduce((acc, curr) => acc + curr.duration, 0) / hist.length
       }
     })
@@ -101,12 +103,12 @@ function App() {
       <table>
         <thead>
           <tr>
-            <th colSpan={6} style={{ textAlign: 'center' }}>
+            <th colSpan={8} style={{ textAlign: 'center' }}>
               Mode: {mode}
             </th>
           </tr>
           <tr>
-            <th colSpan={6} style={{ textAlign: 'center' }}>
+            <th colSpan={8} style={{ textAlign: 'center' }}>
               <div>
                 <progress value={renderCount} max={iterations} />
               </div>
@@ -125,6 +127,7 @@ function App() {
             <th>last duration in ms</th>
             <th>render count</th>
             <th>duration average in ms</th>
+            <th>duration total in ms</th>
             <th>difference duration average</th>
             <th>% difference duration average</th>
           </tr>
@@ -138,6 +141,7 @@ function App() {
                 <td>{row.duration.toPrecision(5)}</td>
                 <td>{row.count}</td>
                 <td>{row.durationAverage.toPrecision(5)}</td>
+                <td>{row.durationTotal.toPrecision(5)}</td>
                 <td>{row.difference === 0 ? '-' : `+${row.difference.toPrecision(5)}`}</td>
                 <td>{row.differenceAvergage === 0 ? '-' : `+${row.differenceAvergage.toPrecision(5)}%`}</td>
               </tr>
