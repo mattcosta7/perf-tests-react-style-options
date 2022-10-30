@@ -8,8 +8,7 @@ export default defineConfig({
   resolve: {
     alias: {
       'react-dom/client': 'react-dom/profiling',
-      'scheduler/tracing': 'scheduler/tracing-profiling'
-      ,
+      'scheduler/tracing': 'scheduler/tracing-profiling',
     },
   },
 })

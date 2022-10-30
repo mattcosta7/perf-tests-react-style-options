@@ -13,7 +13,6 @@ export const StyledColumnWithPropsGetter = styled.div`
     ${props => css(colStyle)}
 `
 
-
 export const StyledRowWithSx = styled.div<SxProp>`
     ${sx}
 `
