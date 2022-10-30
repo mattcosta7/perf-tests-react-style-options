@@ -105,20 +105,12 @@ function App() {
           <tr>
             <th colSpan={8} style={{ textAlign: 'center' }}>
               Mode: {mode}
-            </th>
-          </tr>
-          <tr>
-            <th colSpan={8} style={{ textAlign: 'center' }}>
-              <div>
+              {renderCount < iterations ? <div>
                 <progress value={renderCount} max={iterations} />
-              </div>
-              {renderCount < iterations ? `loading... (${renderCount}/${iterations})` : 'ready'}
-            </th>
-          </tr>
-          <tr>
-            <th colSpan={6} style={{ textAlign: 'center' }}>
-              <button onClick={() => forceRender()}>force render</button>
-              <button onClick={() => window.location.reload()}>re-run from start</button>
+                {renderCount}/{iterations}
+              </div> : <div>
+                <button onClick={() => forceRender()}>force a render</button>
+              </div>}
             </th>
           </tr>
           <tr>
