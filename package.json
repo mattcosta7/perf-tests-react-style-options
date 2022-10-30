@@ -8,6 +8,11 @@
     "build": "tsc && vite build",
     "preview": "vite preview"
   },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "all"
+  },
   "dependencies": {
     "@primer/react": "^35.13.0",
     "@vanilla-extract/css": "^1.9.1",
@@ -22,6 +27,7 @@
     "@types/react-dom": "^18.0.8",
     "@types/styled-components": "^5.1.26",
     "@vitejs/plugin-react": "^2.2.0",
+    "prettier": "^2.7.1",
     "tslib": "^2.4.0",
     "typescript": "^4.8.4",
     "vite": "^3.2.1"
