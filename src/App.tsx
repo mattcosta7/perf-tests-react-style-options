@@ -91,7 +91,8 @@ function App() {
     const output = eachType.map((hist) => {
       return {
         ...hist,
-        difference: (((hist.durationAverage - fastestRender.durationAverage) / fastestRender.durationAverage) * 100)
+        difference: hist.durationAverage - fastestRender.durationAverage,
+        differenceAvergage: (((hist.durationAverage - fastestRender.durationAverage) / fastestRender.durationAverage) * 100)
       }
     })
 
@@ -124,6 +125,7 @@ function App() {
             <th>last duration in ms</th>
             <th>render count</th>
             <th>duration average in ms</th>
+            <th>difference duration average</th>
             <th>% difference duration average</th>
           </tr>
         </thead>
@@ -133,10 +135,11 @@ function App() {
               <tr key={row.id}>
                 <td style={{ textAlign: 'left' }}>{row.id}</td>
                 <td>{row.phase}</td>
-                <td>{row.duration.toFixed(3)}</td>
+                <td>{row.duration.toPrecision(5)}</td>
                 <td>{row.count}</td>
-                <td>{row.durationAverage}</td>
-                <td>{row.difference === 0 ? '-' : `+${row.difference.toFixed(3)}%`}</td>
+                <td>{row.durationAverage.toPrecision(5)}</td>
+                <td>{row.difference === 0 ? '-' : `+${row.difference.toPrecision(5)}`}</td>
+                <td>{row.differenceAvergage === 0 ? '-' : `+${row.differenceAvergage.toPrecision(5)}%`}</td>
               </tr>
             )
           })}
