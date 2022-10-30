@@ -27,8 +27,11 @@ import {
   InlineSXBoxRowStable,
   InlineSXBoxColumnStable,
   InlineStyleBoxRow,
-  InlineStyleBoxColumn
+  InlineStyleBoxColumn,
+  GlobalCssDivRowStable,
+  GlobalCssDivColumnStable
 } from './renderers';
+import './global.css'
 
 function reducer(count: number): number {
   return count + 1
@@ -117,11 +120,11 @@ function App() {
           </tr>
           <tr>
             <th style={{ textAlign: 'left' }}>id</th>
-            <th>phase</th>
-            <th>duration in ms</th>
-            <th>count</th>
-            <th>durationAverage in ms</th>
-            <th>% difference from fastest (avg)</th>
+            <th>last phase</th>
+            <th>last duration in ms</th>
+            <th>render count</th>
+            <th>duration average in ms</th>
+            <th>% difference duration average</th>
           </tr>
         </thead>
         <tbody>
@@ -189,6 +192,11 @@ function App() {
           handleRender={handleRender}
           getRow={InlineStyleDivRow}
           getCol={InlineStyleDivColumn}
+        />
+        <ProfiledGrid name="[Static CSS] - Global"
+          handleRender={handleRender}
+          getRow={GlobalCssDivRowStable}
+          getCol={GlobalCssDivColumnStable}
         />
         <ProfiledGrid name="[Static CSS] - CSS Modules"
           handleRender={handleRender}

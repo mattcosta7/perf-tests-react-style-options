@@ -13,6 +13,8 @@ import styles from './style.module.css';
  */
 export const InlineStyleDivRowStable = ({ children }: PropsWithChildren) => <div style={rowStyle}>{children}</div>;
 export const InlineStyleDivColumnStable = () => <div style={colStyle} />;
+export const GlobalCssDivRowStable = ({ children }: PropsWithChildren) => <div className='row'>{children}</div>;
+export const GlobalCssDivColumnStable = () => <div className='col' />;
 export const InlineStyleDivRow = ({ children }: PropsWithChildren) => <div style={{ ...rowStyle }}>{children}</div>;
 export const InlineStyleDivColumn = () => <div style={{ ...colStyle }} />;
 export const VanillaStyleDivRow = ({ children }: PropsWithChildren) => <div className={rowStyleVanilla}>{children}</div>;
