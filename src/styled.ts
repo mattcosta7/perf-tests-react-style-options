@@ -6,6 +6,18 @@ export const StyledRow = styled.div(rowStyle);
 
 export const StyledCol = styled.div(colStyle);
 
+export const StyledRowWithUnusedDynamicProp = styled.div(rowStyle, () => css``);
+
+export const StyledColWithUnusedDynamicProp = styled.div(colStyle, () => css``);
+
+export const StyledRowWithUnusedDynamicProp5x = styled.div(rowStyle, () => css``, () => css``, () => css``, () => css``, () => css``,);
+
+export const StyledColWithUnusedDynamicProp5x = styled.div(colStyle, () => css``, () => css``, () => css``, () => css``, () => css``,);
+
+export const StyledRowWithUnusedDynamicProp5xStringOnly = styled.div(rowStyle, () => '', () => '', () => '', () => '', () => '');
+
+export const StyledColWithUnusedDynamicProp5xStringOnly = styled.div(colStyle, () => '', () => '', () => '', () => '', () => '');
+
 export const StyledColWithDynamicProps = styled.div<SxProp & { $maxWidth: number }>`
   ${sx}
   max-width: ${(props) => props.$maxWidth}px;

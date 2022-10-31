@@ -11,6 +11,12 @@ import {
   StyledRowWithDynamicProps,
   StyledColWithDynamicPropsStyle,
   StyledRowWithDynamicPropsStyle,
+  StyledColWithUnusedDynamicProp,
+  StyledRowWithUnusedDynamicProp,
+  StyledColWithUnusedDynamicProp5x,
+  StyledRowWithUnusedDynamicProp5x,
+  StyledColWithUnusedDynamicProp5xStringOnly,
+  StyledRowWithUnusedDynamicProp5xStringOnly,
 } from './styled';
 import { colStyle, rowStyle } from './styles';
 import { columnStyledVanilla, rowStyleVanilla } from './styles.css';
@@ -51,6 +57,18 @@ export const VanillaStyleDivRow = ({ children }: PropsWithChildren) => (
 export const VanillaStyleDivColumn = () => <div className={columnStyledVanilla} />;
 export const BaseStyledCol = () => <StyledCol />;
 export const BaseStyledRow = ({ children }: PropsWithChildren) => <StyledRow>{children}</StyledRow>;
+
+
+
+export const StyledColUnusedDynamicProp = () => <StyledColWithUnusedDynamicProp />;
+export const StyledRowUnusedDynamicProp = ({ children }: PropsWithChildren) => <StyledRowWithUnusedDynamicProp>{children}</StyledRowWithUnusedDynamicProp>;
+export const StyledColUnusedDynamicProp5x = () => <StyledColWithUnusedDynamicProp5x />;
+export const StyledRowUnusedDynamicProp5x = ({ children }: PropsWithChildren) => <StyledRowWithUnusedDynamicProp5x>{children}</StyledRowWithUnusedDynamicProp5x>;
+
+
+
+export const StyledColUnusedDynamicProp5xStringOnly = () => <StyledColWithUnusedDynamicProp5xStringOnly />;
+export const StyledRowUnusedDynamicProp5xStringOnly = ({ children }: PropsWithChildren) => <StyledRowWithUnusedDynamicProp5xStringOnly>{children}</StyledRowWithUnusedDynamicProp5xStringOnly>;
 const useRowCount1 = makeCounter()
 const useColumnCount1 = makeCounter()
 export const StyledColDynamicProps = () => {
@@ -117,3 +135,5 @@ export const BaseStyledRowWithPropsGetter = ({ children }: PropsWithChildren) =>
   <StyledRowWithPropsGetter>{children}</StyledRowWithPropsGetter>
 );
 export const BaseStyledColumnWithPropsGetter = () => <StyledColumnWithPropsGetter />;
+
+

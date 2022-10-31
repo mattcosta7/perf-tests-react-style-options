@@ -43,10 +43,17 @@ import {
   StyledRowDynamicPropsStyle,
   StyledRowDynamicProps,
   StyledColDynamicProps,
+  StyledRowUnusedDynamicProp,
+  StyledColUnusedDynamicProp,
+  StyledRowUnusedDynamicProp5x,
+  StyledColUnusedDynamicProp5x,
+  StyledColUnusedDynamicProp5xStringOnly,
+  StyledRowUnusedDynamicProp5xStringOnly,
 } from './renderers';
 import './global.css';
 import { Table } from './Table';
 import { ErrorBoundary } from './ErrorBoundary';
+import { StyledRowWithUnusedDynamicProp5xStringOnly } from './styled';
 
 function reducer(count: number): number {
   return count + 1;
@@ -82,6 +89,21 @@ const configs = [
     name: '[Styled components] - static styles only',
     getRow: BaseStyledRow,
     getCol: BaseStyledCol,
+  },
+  {
+    name: '[Styled components] - static styles only unused dynamic ${props => css``}',
+    getRow: StyledRowUnusedDynamicProp,
+    getCol: StyledColUnusedDynamicProp,
+  },
+  {
+    name: '[Styled components] - static styles only unused dynamic ${props => css``,props => css``,props => css``,props => css``,props => css``}',
+    getRow: StyledRowUnusedDynamicProp5x,
+    getCol: StyledColUnusedDynamicProp5x,
+  },
+  {
+    name: "[Styled components] - static styles only unused dynamic ${props => '',props => '',props => '',props => '',props => ''}",
+    getRow: StyledRowUnusedDynamicProp5xStringOnly,
+    getCol: StyledColUnusedDynamicProp5xStringOnly,
   },
   {
     name: '[Styled components] - dynamic style creation ${props => css(obj)}',
