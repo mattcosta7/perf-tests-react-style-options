@@ -125,6 +125,10 @@ const configs = [
   },
 ];
 
+if (new Set(configs.map((c) => c.name)).size !== configs.length) {
+  throw new Error('Config names must be unique');
+}
+
 const defaultWrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 
 function App() {
@@ -232,7 +236,7 @@ function App() {
         />
       </div>
       <ul key={mode === 'mount' ? renderCount : undefined}>
-        {configs.map(({ getWrapper: Wrapper = defaultWrapper, ...props }, i) => {
+        {configs.map(({ getWrapper: Wrapper = defaultWrapper, ...props }) => {
           return (
             <Wrapper key={props.name}>
               <ProfiledGrid {...props} handleRender={handleRender} />
