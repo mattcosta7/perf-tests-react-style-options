@@ -1,5 +1,5 @@
 import { Box } from '@primer/react';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useEffect, useReducer, useRef } from 'react';
 import {
   StyledCol,
   StyledRowWithPropsGetter,
@@ -7,11 +7,26 @@ import {
   StyledColWithSx,
   StyledRow,
   StyledRowWithSx,
+  StyledColWithDynamicProps,
+  StyledRowWithDynamicProps,
+  StyledColWithDynamicPropsStyle,
+  StyledRowWithDynamicPropsStyle,
 } from './styled';
 import { colStyle, rowStyle } from './styles';
 import { columnStyledVanilla, rowStyleVanilla } from './styles.css';
 import styles from './style.module.css';
 
+
+const makeCounter = () => {
+  let counter = 0
+  return () => {
+    const _count = counter
+    useEffect(() => {
+      counter++
+    })
+    return _count
+  }
+}
 /**
  * Defining each of these as an line function call here.
  * We don't pass the styled component directly, to avoid
@@ -36,6 +51,27 @@ export const VanillaStyleDivRow = ({ children }: PropsWithChildren) => (
 export const VanillaStyleDivColumn = () => <div className={columnStyledVanilla} />;
 export const BaseStyledCol = () => <StyledCol />;
 export const BaseStyledRow = ({ children }: PropsWithChildren) => <StyledRow>{children}</StyledRow>;
+const useRowCount1 = makeCounter()
+const useColumnCount1 = makeCounter()
+export const StyledColDynamicProps = () => {
+  const maxWidth = useColumnCount1()
+  return <StyledColWithDynamicProps sx={colStyle} $maxWidth={maxWidth} />;
+}
+export const StyledRowDynamicProps = ({ children }: PropsWithChildren) => {
+  const maxWidth = useRowCount1()
+  return <StyledRowWithDynamicProps sx={rowStyle} $maxWidth={maxWidth} > {children}</StyledRowWithDynamicProps>;
+}
+
+const useRowCount2 = makeCounter()
+const useColumnCount2 = makeCounter()
+export const StyledColDynamicPropsStyle = () => {
+  const maxWidth = useColumnCount2()
+  return <StyledColWithDynamicPropsStyle sx={colStyle} $maxWidth={maxWidth} />;
+}
+export const StyledRowDynamicPropsStyle = ({ children }: PropsWithChildren) => {
+  const maxWidth = useRowCount2()
+  return <StyledRowWithDynamicPropsStyle sx={rowStyle} $maxWidth={maxWidth} > {children}</StyledRowWithDynamicPropsStyle>;
+}
 export const ModStyleDivRow = ({ children }: PropsWithChildren) => (
   <div className={styles.rowStyleModule}>{children}</div>
 );
@@ -52,6 +88,23 @@ export const InlineSXBoxRow = ({ children }: PropsWithChildren) => (
   <Box sx={{ ...rowStyle }}>{children}</Box>
 );
 export const InlineSXBoxColumn = () => <Box sx={{ ...colStyle }} />;
+
+
+const useRowCount = makeCounter()
+const useColumnCount = makeCounter()
+
+
+
+export const InlineSXBoxRowNewStyleProp = ({ children }: PropsWithChildren) => {
+  const size = useRowCount()
+  return <Box sx={{ ...rowStyle, maxWidth: size }}>{children}</Box>
+}
+
+
+export const InlineSXBoxColumnNewStyleProp = () => {
+  const size = useColumnCount()
+  return <Box sx={{ ...colStyle, maxWidth: size }} />;
+}
 export const InlineSXBoxRowStable = ({ children }: PropsWithChildren) => (
   <Box sx={rowStyle}>{children}</Box>
 );

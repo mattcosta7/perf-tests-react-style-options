@@ -1,5 +1,5 @@
-import { theme } from '@primer/react';
-import {
+import { theme, ThemeProvider } from '@primer/react';
+import React, {
   ProfilerOnRenderCallback,
   useEffect,
   useReducer,
@@ -9,13 +9,14 @@ import {
   StrictMode,
 } from 'react';
 import { ProfiledGrid } from './ProfileGrid';
-import { ThemeProvider } from 'styled-components';
 import { createRoot, Root } from 'react-dom/client';
 import { columnsCount, iterations, mode, rowsCount } from './params';
 import { Form } from './Form';
 import {
   InlineStyleDivRowStable,
   InlineStyleDivColumnStable,
+  InlineSXBoxRowNewStyleProp,
+  InlineSXBoxColumnNewStyleProp,
   InlineStyleDivRow,
   InlineStyleDivColumn,
   ModStyleDivRow,
@@ -38,6 +39,10 @@ import {
   InlineStyleBoxColumn,
   GlobalCssDivRowStable,
   GlobalCssDivColumnStable,
+  StyledColDynamicPropsStyle,
+  StyledRowDynamicPropsStyle,
+  StyledRowDynamicProps,
+  StyledColDynamicProps,
 } from './renderers';
 import './global.css';
 import { Table } from './Table';
@@ -94,6 +99,16 @@ const configs = [
     getCol: StyledColumnWithPropsGetterWithStableSx,
   },
   {
+    name: '[Styled components] - SX prop + New css declaration per render {dynamic maxWidth}',
+    getRow: StyledRowDynamicProps,
+    getCol: StyledColDynamicProps,
+  },
+  {
+    name: '[Styled components] - SX prop + Style update from dynamic prop attrs',
+    getRow: StyledRowDynamicPropsStyle,
+    getCol: StyledColDynamicPropsStyle,
+  },
+  {
     name: '[Box] - SX prop, dynamic object',
     getRow: InlineSXBoxRow,
     getCol: InlineSXBoxColumn,
@@ -124,6 +139,11 @@ const configs = [
       <ThemeProvider theme={theme}>{children}</ThemeProvider>
     ),
   },
+  {
+    name: "[Box] - SX prop + New css declaration per render {dynamic maxWidth}",
+    getRow: InlineSXBoxRowNewStyleProp,
+    getCol: InlineSXBoxColumnNewStyleProp,
+  }
 ];
 
 if (new Set(configs.map((c) => c.name)).size !== configs.length) {
@@ -154,6 +174,10 @@ function App() {
 
   useEffect(() => {
     if (!outputRef.current) return;
+    /**
+     * Only createRoot once (strict mode fix)
+     */
+    if (outputRoot.current) return;
     outputRoot.current = createRoot(outputRef.current);
   }, []);
 
