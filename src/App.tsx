@@ -6,7 +6,7 @@ import {
   useRef,
   useCallback,
   startTransition,
-  useMemo,
+  StrictMode,
 } from 'react';
 import { ProfiledGrid } from './ProfileGrid';
 import { ThemeProvider } from 'styled-components';
@@ -41,6 +41,7 @@ import {
 } from './renderers';
 import './global.css';
 import { Table } from './Table';
+import { ErrorBoundary } from './ErrorBoundary';
 
 function reducer(count: number): number {
   return count + 1;
@@ -189,13 +190,17 @@ function App() {
     });
 
     outputRoot.current.render(
-      <Table
-        mode={mode}
-        iterations={iterations}
-        renderHistories={output}
-        renderCount={renderCount}
-        onForceRenderClick={forceRender}
-      />,
+      <StrictMode>
+        <ErrorBoundary>
+          <Table
+            mode={mode}
+            iterations={iterations}
+            renderHistories={output}
+            renderCount={renderCount}
+            onForceRenderClick={forceRender}
+          />
+        </ErrorBoundary>
+      </StrictMode>,
     );
   });
 
