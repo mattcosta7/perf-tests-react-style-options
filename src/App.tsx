@@ -39,6 +39,7 @@ import {
   GlobalCssDivColumnStable,
 } from './renderers';
 import './global.css';
+import { Table } from './Table';
 
 function reducer(count: number): number {
   return count + 1;
@@ -95,64 +96,20 @@ function App() {
       return {
         ...hist,
         difference: hist.durationAverage - fastestRender.durationAverage,
-        differenceAvergage:
+        differenceAverage:
           ((hist.durationAverage - fastestRender.durationAverage) / fastestRender.durationAverage) *
           100,
       };
     });
 
     outputRoot.current.render(
-      <table>
-        <thead>
-          <tr>
-            <th colSpan={8} style={{ textAlign: 'center' }}>
-              Mode: {mode}
-              {renderCount < iterations ? (
-                <div>
-                  <progress value={renderCount} max={iterations} />
-                  {renderCount}/{iterations}
-                </div>
-              ) : (
-                <div>
-                  <button onClick={() => forceRender()}>force a render</button>
-                </div>
-              )}
-            </th>
-          </tr>
-          <tr>
-            <th style={{ textAlign: 'left' }}>id</th>
-            <th>last phase</th>
-            <th>last duration in ms</th>
-            <th>render count</th>
-            <th>duration average in ms</th>
-            <th>duration total in ms</th>
-            <th>difference duration average</th>
-            <th>% difference duration average</th>
-          </tr>
-        </thead>
-        <tbody>
-          {output
-            .sort((a, b) => a.durationAverage - b.durationAverage)
-            .map((row) => {
-              return (
-                <tr key={row.id}>
-                  <td style={{ textAlign: 'left' }}>{row.id}</td>
-                  <td>{row.phase}</td>
-                  <td>{row.duration.toPrecision(5)}</td>
-                  <td>{row.count}</td>
-                  <td>{row.durationAverage.toPrecision(5)}</td>
-                  <td>{row.durationTotal.toPrecision(5)}</td>
-                  <td>{row.difference === 0 ? '-' : `+${row.difference.toPrecision(5)}`}</td>
-                  <td>
-                    {row.differenceAvergage === 0
-                      ? '-'
-                      : `+${row.differenceAvergage.toPrecision(5)}%`}
-                  </td>
-                </tr>
-              );
-            })}
-        </tbody>
-      </table>,
+      <Table
+        mode={mode}
+        iterations={iterations}
+        renderHistories={output}
+        renderCount={renderCount}
+        onForceRenderClick={forceRender}
+      />,
     );
   });
 
