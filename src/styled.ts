@@ -8,18 +8,18 @@ export const StyledCol = styled.div(colStyle);
 
 export const StyledColWithDynamicProps = styled.div<SxProp & { $maxWidth: number }>`
   ${sx}
-  max-width: ${(props) => props.$maxWidth};
+  max-width: ${(props) => props.$maxWidth}px;
 `
 
 export const StyledRowWithDynamicProps = styled.div<SxProp & { $maxWidth: number }>`
   ${sx}
-  max-width: ${(props) => props.$maxWidth};
+  max-width: ${(props) => props.$maxWidth}px;
 `
 
 export const StyledColWithDynamicPropsStyle = styled.div.attrs<SxProp & { $maxWidth: number }>(props => {
   return {
     style: {
-      maxWidth: props.$maxWidth
+      maxWidth: (props.$maxWidth || 1) + 'px'
     }
   }
 }) <SxProp & { $maxWidth: number }>`
@@ -29,7 +29,7 @@ export const StyledColWithDynamicPropsStyle = styled.div.attrs<SxProp & { $maxWi
 export const StyledRowWithDynamicPropsStyle = styled.div.attrs<SxProp & { $maxWidth: number }>(props => {
   return {
     style: {
-      maxWidth: props.$maxWidth
+      maxWidth: (props.$maxWidth ?? 1) + 'px'
     }
   }
 }) <SxProp & { $maxWidth: number }>`
