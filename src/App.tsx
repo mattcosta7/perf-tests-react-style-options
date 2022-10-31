@@ -1,175 +1,23 @@
-import { theme, ThemeProvider } from '@primer/react';
 import React, {
   ProfilerOnRenderCallback,
+  startTransition,
+  StrictMode,
+  useCallback,
   useEffect,
   useReducer,
   useRef,
-  useCallback,
-  startTransition,
-  StrictMode,
 } from 'react';
-import { ProfiledGrid } from './ProfileGrid';
 import { createRoot, Root } from 'react-dom/client';
-import { columnsCount, iterations, mode, rowsCount } from './params';
-import { Form } from './Form';
-import {
-  InlineStyleDivRowStable,
-  InlineStyleDivColumnStable,
-  InlineSXBoxRowNewStyleProp,
-  InlineSXBoxColumnNewStyleProp,
-  InlineStyleDivRow,
-  InlineStyleDivColumn,
-  ModStyleDivRow,
-  ModStyleDivColumn,
-  VanillaStyleDivRow,
-  VanillaStyleDivColumn,
-  BaseStyledRow,
-  BaseStyledCol,
-  BaseStyledRowWithPropsGetter,
-  BaseStyledColumnWithPropsGetter,
-  InlineSXStyledRow,
-  InlineSXStyledColumn,
-  StyledRowWithPropsGetterWithStableSx,
-  StyledColumnWithPropsGetterWithStableSx,
-  InlineSXBoxRow,
-  InlineSXBoxColumn,
-  InlineSXBoxRowStable,
-  InlineSXBoxColumnStable,
-  InlineStyleBoxRow,
-  InlineStyleBoxColumn,
-  GlobalCssDivRowStable,
-  GlobalCssDivColumnStable,
-  StyledColDynamicPropsStyle,
-  StyledRowDynamicPropsStyle,
-  StyledRowDynamicProps,
-  StyledColDynamicProps,
-  StyledRowUnusedDynamicProp,
-  StyledColUnusedDynamicProp,
-  StyledRowUnusedDynamicProp5x,
-  StyledColUnusedDynamicProp5x,
-  StyledColUnusedDynamicProp5xStringOnly,
-  StyledRowUnusedDynamicProp5xStringOnly,
-} from './renderers';
-import './global.css';
-import { Table } from './Table';
+import { configs } from './configs';
 import { ErrorBoundary } from './ErrorBoundary';
-import { StyledRowWithUnusedDynamicProp5xStringOnly } from './styled';
+import { Form } from './Form';
+import './global.css';
+import { columnsCount, iterations, mode, rowsCount } from './params';
+import { ProfiledGrid } from './ProfileGrid';
+import { Table } from './Table';
 
 function reducer(count: number): number {
   return count + 1;
-}
-
-const configs = [
-  {
-    name: '[Inline styles] - stable object',
-    getRow: InlineStyleDivRowStable,
-    getCol: InlineStyleDivColumnStable,
-  },
-  {
-    name: '[Inline styles] - dynamic object',
-    getRow: InlineStyleDivRow,
-    getCol: InlineStyleDivColumn,
-  },
-  {
-    name: '[Static CSS] - Global',
-    getRow: GlobalCssDivRowStable,
-    getCol: GlobalCssDivColumnStable,
-  },
-  {
-    name: '[Static CSS] - CSS Modules',
-    getRow: ModStyleDivRow,
-    getCol: ModStyleDivColumn,
-  },
-  {
-    name: '[Static CSS] - Vanilla extract',
-    getRow: VanillaStyleDivRow,
-    getCol: VanillaStyleDivColumn,
-  },
-  {
-    name: '[Styled components] - static styles only',
-    getRow: BaseStyledRow,
-    getCol: BaseStyledCol,
-  },
-  {
-    name: '[Styled components] - static styles only unused dynamic ${props => css``}',
-    getRow: StyledRowUnusedDynamicProp,
-    getCol: StyledColUnusedDynamicProp,
-  },
-  {
-    name: '[Styled components] - static styles only unused dynamic ${props => css``,props => css``,props => css``,props => css``,props => css``}',
-    getRow: StyledRowUnusedDynamicProp5x,
-    getCol: StyledColUnusedDynamicProp5x,
-  },
-  {
-    name: "[Styled components] - static styles only unused dynamic ${props => '',props => '',props => '',props => '',props => ''}",
-    getRow: StyledRowUnusedDynamicProp5xStringOnly,
-    getCol: StyledColUnusedDynamicProp5xStringOnly,
-  },
-  {
-    name: '[Styled components] - dynamic style creation ${props => css(obj)}',
-    getRow: BaseStyledRowWithPropsGetter,
-    getCol: BaseStyledColumnWithPropsGetter,
-  },
-  {
-    name: '[Styled components] - SX prop, dynamic object',
-    getRow: InlineSXStyledRow,
-    getCol: InlineSXStyledColumn,
-  },
-  {
-    name: '[Styled components] - SX prop, stable object',
-    getRow: StyledRowWithPropsGetterWithStableSx,
-    getCol: StyledColumnWithPropsGetterWithStableSx,
-  },
-  {
-    name: '[Styled components] - SX prop + New css declaration per render {dynamic maxWidth}',
-    getRow: StyledRowDynamicProps,
-    getCol: StyledColDynamicProps,
-  },
-  {
-    name: '[Styled components] - SX prop + Style update from dynamic prop attrs',
-    getRow: StyledRowDynamicPropsStyle,
-    getCol: StyledColDynamicPropsStyle,
-  },
-  {
-    name: '[Box] - SX prop, dynamic object',
-    getRow: InlineSXBoxRow,
-    getCol: InlineSXBoxColumn,
-  },
-  {
-    name: '[Box] - SX prop, stable object',
-    getRow: InlineSXBoxRowStable,
-    getCol: InlineSXBoxColumnStable,
-  },
-  {
-    name: '[Box] - inline style',
-    getRow: InlineStyleBoxRow,
-    getCol: InlineStyleBoxColumn,
-  },
-  {
-    name: '[Box] - SX prop, inside `ThemeProvider`',
-    getRow: InlineSXBoxRow,
-    getCol: InlineSXBoxColumn,
-    getWrapper: ({ children }: { children: React.ReactNode }) => (
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
-    ),
-  },
-  {
-    name: '[Box] - inline style, inside `ThemeProvider`',
-    getRow: InlineStyleBoxRow,
-    getCol: InlineStyleBoxColumn,
-    getWrapper: ({ children }: { children: React.ReactNode }) => (
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
-    ),
-  },
-  {
-    name: "[Box] - SX prop + New css declaration per render {dynamic maxWidth}",
-    getRow: InlineSXBoxRowNewStyleProp,
-    getCol: InlineSXBoxColumnNewStyleProp,
-  }
-];
-
-if (new Set(configs.map((c) => c.name)).size !== configs.length) {
-  throw new Error('Config names must be unique');
 }
 
 const defaultWrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;

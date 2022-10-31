@@ -3,7 +3,7 @@ import { rowsCount, columnsCount } from './params';
 
 const rows = Array(rowsCount).fill(null);
 const cols = Array(columnsCount).fill(null);
-interface ProfileGridProps {
+export interface ProfileGridProps {
   name: string;
   getRow: (props: PropsWithChildren) => JSX.Element;
   getCol: (props: PropsWithChildren) => JSX.Element;
