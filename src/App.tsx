@@ -234,7 +234,7 @@ function App() {
       <ul key={mode === 'mount' ? renderCount : undefined}>
         {configs.map(({ getWrapper: Wrapper = defaultWrapper, ...props }, i) => {
           return (
-            <Wrapper key={i}>
+            <Wrapper key={props.name}>
               <ProfiledGrid {...props} handleRender={handleRender} />
             </Wrapper>
           );
