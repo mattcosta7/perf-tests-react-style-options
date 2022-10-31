@@ -30,3 +30,5 @@ export function ProfiledGrid({ name, getRow: Row, getCol: Col, handleRender }: P
     </li>
   );
 }
+
+ProfiledGrid.displayName = 'ProfiledGrid';

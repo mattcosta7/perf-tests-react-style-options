@@ -49,3 +49,5 @@ export const Form = memo(function Form({
     </form>
   );
 });
+
+Form.displayName = 'Form';

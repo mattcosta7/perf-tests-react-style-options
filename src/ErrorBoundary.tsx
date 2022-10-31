@@ -1,6 +1,7 @@
 import { Component, PropsWithChildren } from 'react';
 
 export class ErrorBoundary extends Component<PropsWithChildren<{}>, { hasError: boolean }> {
+  static displayName = 'ErrorBoundary';
   state = { hasError: false };
   render() {
     if (this.state.hasError) {

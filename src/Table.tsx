@@ -1,4 +1,3 @@
-import { memo } from 'react';
 import { Modes } from './params';
 
 interface TableProps {
@@ -77,3 +76,5 @@ export function Table({
     </table>
   );
 }
+
+Table.displayName = 'Table';
