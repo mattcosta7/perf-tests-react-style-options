@@ -6,8 +6,9 @@ import {
   useRef,
   useCallback,
   startTransition,
+  useMemo,
 } from 'react';
-import { ProfiledGrid } from './grid';
+import { ProfiledGrid } from './ProfileGrid';
 import { ThemeProvider } from 'styled-components';
 import { createRoot, Root } from 'react-dom/client';
 import { columnsCount, iterations, mode, rowsCount } from './params';
@@ -44,6 +45,87 @@ import { Table } from './Table';
 function reducer(count: number): number {
   return count + 1;
 }
+
+const configs = [
+  {
+    name: '[Inline styles] - stable object',
+    getRow: InlineStyleDivRowStable,
+    getCol: InlineStyleDivColumnStable,
+  },
+  {
+    name: '[Inline styles] - dynamic object',
+    getRow: InlineStyleDivRow,
+    getCol: InlineStyleDivColumn,
+  },
+  {
+    name: '[Static CSS] - Global',
+    getRow: GlobalCssDivRowStable,
+    getCol: GlobalCssDivColumnStable,
+  },
+  {
+    name: '[Static CSS] - CSS Modules',
+    getRow: ModStyleDivRow,
+    getCol: ModStyleDivColumn,
+  },
+  {
+    name: '[Static CSS] - Vanilla extract',
+    getRow: VanillaStyleDivRow,
+    getCol: VanillaStyleDivColumn,
+  },
+  {
+    name: '[Styled components] - static styles only',
+    getRow: BaseStyledRow,
+    getCol: BaseStyledCol,
+  },
+  {
+    name: '[Styled components] - dynamic style creation ${props => css(obj)}',
+    getRow: BaseStyledRowWithPropsGetter,
+    getCol: BaseStyledColumnWithPropsGetter,
+  },
+  {
+    name: '[Styled components] - SX prop, dynamic object',
+    getRow: InlineSXStyledRow,
+    getCol: InlineSXStyledColumn,
+  },
+  {
+    name: '[Styled components] - SX prop, stable object',
+    getRow: StyledRowWithPropsGetterWithStableSx,
+    getCol: StyledColumnWithPropsGetterWithStableSx,
+  },
+  {
+    name: '[Box] - SX prop, dynamic object',
+    getRow: InlineSXBoxRow,
+    getCol: InlineSXBoxColumn,
+  },
+  {
+    name: '[Box] - SX prop, stable object',
+    getRow: InlineSXBoxRowStable,
+    getCol: InlineSXBoxColumnStable,
+  },
+  {
+    name: '[Box] - inline style',
+    getRow: InlineStyleBoxRow,
+    getCol: InlineStyleBoxColumn,
+  },
+  {
+    name: '[Box] - SX prop, inside `ThemeProvider`',
+    getRow: InlineSXBoxRow,
+    getCol: InlineSXBoxColumn,
+    getWrapper: ({ children }: { children: React.ReactNode }) => (
+      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+    ),
+  },
+  {
+    name: '[Box] - inline style, inside `ThemeProvider`',
+    getRow: InlineStyleBoxRow,
+    getCol: InlineStyleBoxColumn,
+    getWrapper: ({ children }: { children: React.ReactNode }) => (
+      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+    ),
+  },
+];
+
+const defaultWrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;
 
 function App() {
   const outputRef = useRef<HTMLDivElement>(null);
@@ -115,14 +197,13 @@ function App() {
 
   useEffect(() => {
     if (outputRoot.current == null) return;
-    if (renderCount < iterations) {
-      /**
-       * using transition to keep the form input interactive
-       */
-      startTransition(() => {
-        forceRender();
-      });
-    }
+    if (renderCount >= iterations) return;
+    /**
+     * using transition to keep the form input interactive
+     */
+    startTransition(() => {
+      forceRender();
+    });
   }, [renderCount]);
 
   return (
@@ -144,102 +225,20 @@ function App() {
           iterations={iterations}
           defaultColsCount={columnsCount}
           defaultRowsCount={rowsCount}
-          onSubmit={() => {
+          onSubmit={useCallback(() => {
             outputRoot.current?.unmount();
             outputRoot.current = null;
-          }}
+          }, [])}
         />
       </div>
       <ul key={mode === 'mount' ? renderCount : undefined}>
-        <ProfiledGrid
-          name="[Inline styles] - stable object"
-          handleRender={handleRender}
-          getRow={InlineStyleDivRowStable}
-          getCol={InlineStyleDivColumnStable}
-        />
-        <ProfiledGrid
-          name="[Inline styles] - dynamic object"
-          handleRender={handleRender}
-          getRow={InlineStyleDivRow}
-          getCol={InlineStyleDivColumn}
-        />
-        <ProfiledGrid
-          name="[Static CSS] - Global"
-          handleRender={handleRender}
-          getRow={GlobalCssDivRowStable}
-          getCol={GlobalCssDivColumnStable}
-        />
-        <ProfiledGrid
-          name="[Static CSS] - CSS Modules"
-          handleRender={handleRender}
-          getRow={ModStyleDivRow}
-          getCol={ModStyleDivColumn}
-        />
-        <ProfiledGrid
-          name="[Static CSS] - Vanilla extract"
-          handleRender={handleRender}
-          getRow={VanillaStyleDivRow}
-          getCol={VanillaStyleDivColumn}
-        />
-        <ProfiledGrid
-          name="[Styled components] - static styles only"
-          handleRender={handleRender}
-          getRow={BaseStyledRow}
-          getCol={BaseStyledCol}
-        />
-        <ProfiledGrid
-          name="[Styled components] - dynamic style creation ${props => css(obj)}"
-          handleRender={handleRender}
-          getRow={BaseStyledRowWithPropsGetter}
-          getCol={BaseStyledColumnWithPropsGetter}
-        />
-
-        <ProfiledGrid
-          name="[Styled components] - SX prop, dynamic object"
-          handleRender={handleRender}
-          getRow={InlineSXStyledRow}
-          getCol={InlineSXStyledColumn}
-        />
-        <ProfiledGrid
-          name="[Styled components] - SX prop, stable object"
-          handleRender={handleRender}
-          getRow={StyledRowWithPropsGetterWithStableSx}
-          getCol={StyledColumnWithPropsGetterWithStableSx}
-        />
-        <ProfiledGrid
-          name="[Box] - SX prop, dynamic object"
-          handleRender={handleRender}
-          getRow={InlineSXBoxRow}
-          getCol={InlineSXBoxColumn}
-        />
-        <ProfiledGrid
-          name="[Box] - SX prop, stable object"
-          handleRender={handleRender}
-          getRow={InlineSXBoxRowStable}
-          getCol={InlineSXBoxColumnStable}
-        />
-        <ProfiledGrid
-          name="[Box] - inline style"
-          handleRender={handleRender}
-          getRow={InlineStyleBoxRow}
-          getCol={InlineStyleBoxColumn}
-        />
-        <ThemeProvider theme={theme}>
-          <ProfiledGrid
-            name="[Box] - SX prop, inside `ThemeProvider`"
-            handleRender={handleRender}
-            getRow={InlineSXBoxRow}
-            getCol={InlineSXBoxColumn}
-          />
-        </ThemeProvider>
-        <ThemeProvider theme={theme}>
-          <ProfiledGrid
-            name="[Box] - inline style, inside `ThemeProvider`"
-            handleRender={handleRender}
-            getRow={InlineStyleBoxRow}
-            getCol={InlineStyleBoxColumn}
-          />
-        </ThemeProvider>
+        {configs.map(({ getWrapper: Wrapper = defaultWrapper, ...props }, i) => {
+          return (
+            <Wrapper key={i}>
+              <ProfiledGrid {...props} handleRender={handleRender} />
+            </Wrapper>
+          );
+        })}
       </ul>
     </div>
   );

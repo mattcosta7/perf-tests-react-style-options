@@ -9,6 +9,7 @@ export const StyledCol = styled.div(colStyle);
 export const StyledRowWithPropsGetter = styled.div`
   ${(props) => css(rowStyle)}
 `;
+
 export const StyledColumnWithPropsGetter = styled.div`
   ${(props) => css(colStyle)}
 `;
