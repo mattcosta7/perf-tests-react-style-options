@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import * as ReactDOMClient from 'react-dom/client';
 import App from './App';
 import { ErrorBoundary } from './ErrorBoundary';
@@ -9,7 +10,9 @@ import { ErrorBoundary } from './ErrorBoundary';
 ReactDOMClient.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED.usingClientEntryPoint = true;
 
 ReactDOMClient.createRoot(document.getElementById('root') as HTMLElement).render(
-  <ErrorBoundary>
-    <App />
-  </ErrorBoundary>,
+  <StrictMode>
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  </StrictMode>,
 );
